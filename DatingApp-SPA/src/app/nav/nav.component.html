@@ -9,7 +9,10 @@
       <a class="nav-link" href="#">Lists</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link disabled" href="#">messages</a>
+      <a class="nav-link disabled" href="#">Messages</a>
+    </li>
+    <li class="nav-item" *ngIf="loggedIn()" (click) = "logout()">
+      <a class="nav-link" href="#">Logout</a>
     </li>
   </ul>
   <div *ngIf="loggedIn()" class="dropdown">

@@ -44,13 +44,14 @@ namespace DatingApp.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginDto userToLogin)
         {
+            //throw new Exception("computer dice no!!");
             userToLogin.Username = userToLogin.Username.ToLower();
             var userFromRepo = await _repo.Login(userToLogin.Username, userToLogin.Password);
             if (userFromRepo == null)
                 return Unauthorized();
 
             var claims = new[]
-            {
+            {   
                 new Claim(ClaimTypes.NameIdentifier, userFromRepo.id.ToString()),
                 new Claim(ClaimTypes.Name, userFromRepo.Username)
             };
