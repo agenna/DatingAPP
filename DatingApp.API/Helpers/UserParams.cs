@@ -19,5 +19,9 @@ namespace DatingApp.API.Helpers
         public int MaxAge {get; set;} = 99;
 
         public int MinAge {get; set;} = 18;
+
+        public bool Likees {get; set;} = false;
+        
+        public bool Likers {get; set;} =false;
     }
 }

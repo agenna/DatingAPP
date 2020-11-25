@@ -6,6 +6,7 @@ using AutoMapper;
 using DatingApp.API.Data;
 using DatingApp.API.Dto;
 using DatingApp.API.Helpers;
+using DatingApp.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,10 +32,10 @@ namespace DatingApp.API.Controllers
             var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var userFormRepo = await _repo.GetUser(currentUserId);
             userParams.UserId = currentUserId;
-            if( string.IsNullOrEmpty(userParams.Gender)){
+/*             if( string.IsNullOrEmpty(userParams.Gender)){
                 userParams.Gender = userFormRepo.Gender == "female" ? "male" : "female";
             }
-            
+ */            
             var users = await _repo.GetUsers(userParams);
             var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
             
@@ -62,6 +63,34 @@ namespace DatingApp.API.Controllers
                 return NoContent();
 
             throw new Exception("Updating user {id} failed on server"); 
+        }
+        [HttpPost("{id}/like/{recipientId}")] 
+        public async Task<IActionResult> LikeUser(int id, int recipientId)
+        {
+            if(id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                return Unauthorized();
+            
+            if(id == recipientId)
+                return BadRequest("Not possible input like on yourself");
+                
+            var likeFromRepo = await _repo.GetLike(id, recipientId);
+            if(likeFromRepo != null)
+                return BadRequest("Like already present");
+            
+            var recipientFromRepo = await _repo.GetUser(recipientId);
+            if(recipientFromRepo == null)
+                return NotFound();
+
+            var like = new Like{
+                LikerId=id,
+                LikeeId=recipientId
+            };
+
+            _repo.Add<Like>(like); 
+            if(await _repo.SaveAll())
+                return Ok();
+
+            throw new Exception("Adding like failed on server");   
         }
     }
 }
